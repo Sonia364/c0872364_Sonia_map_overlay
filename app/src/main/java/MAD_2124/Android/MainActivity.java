@@ -109,10 +109,22 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 // set marker
                 setMarker(latLng);
             }
-
+//          set marker titles for all the four locations
             private void setMarker(LatLng latLng) {
                 MarkerOptions options = new MarkerOptions().position(latLng)
                         .title("Your destination");
+            if(markers.size() == 0){
+                options = new MarkerOptions().position(latLng).title("A");
+            }
+            if(markers.size() == 1){
+                options = new MarkerOptions().position(latLng).title("B");
+            }
+            if(markers.size() == 2){
+                options = new MarkerOptions().position(latLng).title("C");
+            }
+            if(markers.size() == 3){
+                options = new MarkerOptions().position(latLng).title("D");
+            }
 
                 /*if (destMarker != null) clearMap();
 
@@ -140,6 +152,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 shape = mMap.addPolygon(options);
+
 
             }
 
