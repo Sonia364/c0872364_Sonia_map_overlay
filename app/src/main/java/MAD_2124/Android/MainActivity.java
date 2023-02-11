@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -25,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,7 +100,6 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
         else
             startUpdateLocation();
 
-
         // apply long press gesture
         mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
@@ -108,7 +109,11 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
 //                location.setLongitude(latLng.longitude);
                 // set marker
                 setMarker(latLng);
+
             }
+
+
+
 //          set marker titles for all the four locations
             private void setMarker(LatLng latLng) {
                 MarkerOptions options = new MarkerOptions().position(latLng)
@@ -139,12 +144,14 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 markers.add(mMap.addMarker(options));
                 if (markers.size() == POLYGON_SIDES)
                     drawShape();
+
             }
 
             private void drawShape() {
                 PolygonOptions options = new PolygonOptions()
                         .fillColor(Color.argb(35, 0, 128, 0))
                         .strokeColor(Color.RED)
+                        .clickable(true)
                         .strokeWidth(10);
 
                 for (int i=0; i<POLYGON_SIDES; i++) {
@@ -152,6 +159,7 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 }
 
                 shape = mMap.addPolygon(options);
+
 
 
             }
@@ -172,15 +180,41 @@ public class MainActivity extends FragmentActivity implements OnMapReadyCallback
                 shape.remove();
                 shape = null;
             }
-            /*
-            private void drawLine() {
-                PolylineOptions options = new PolylineOptions()
-                        .color(Color.BLACK)
-                        .width(10)
-                        .add(homeMarker.getPosition(), destMarker.getPosition());
-                line = mMap.addPolyline(options);
-            }*/
         });
+
+//        mMap.setOnPolylineClickListener(new GoogleMap.OnPolylineClickListener() {
+//            @Override
+//            public void onPolylineClick(Polyline polyline) {
+//                // Get the two end points of the polyline
+//                LatLng start = polyline.getPoints().get(0);
+//                LatLng end = polyline.getPoints().get(1);
+//
+//                // Calculate distance between the two end points
+//                double distance = SphericalUtil.computeDistanceBetween(start, end);
+//                Toast.makeText(MainActivity.this, "Distance between " + start.toString() + " and " + end.toString() + " is " + distance + " meters", Toast.LENGTH_SHORT).show();
+//            }
+//        });
+
+        mMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener(){
+        @Override
+        public void onPolygonClick(Polygon polygon) {
+            // Get the points of the polygon
+            List<LatLng> points = polygon.getPoints();
+            double distance = 0;
+            // Calculate the distance between each pair of points
+            for (int i = 0; i < points.size() - 1; i++) {
+                LatLng point1 = points.get(i);
+                LatLng point2 = points.get(i + 1);
+                distance += SphericalUtil.computeDistanceBetween(point1, point2);
+
+            }
+
+            // Display the distance
+            Toast.makeText(MainActivity.this,
+                    "Distance: " + String.format("%.2f", distance) + " meters", Toast.LENGTH_SHORT).show();
+        }
+        });
+
     }
 
     private void startUpdateLocation() {
